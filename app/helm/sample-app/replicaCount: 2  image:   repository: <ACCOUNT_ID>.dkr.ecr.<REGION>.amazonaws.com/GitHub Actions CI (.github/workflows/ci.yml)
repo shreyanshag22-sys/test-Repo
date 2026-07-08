@@ -1,0 +1,41 @@
+name: Build and Push Image
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE }}
+        aws-region: us-east-1
+
+    - uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build Image
+      run: |
+        docker build -t sample-app ./app
+
+    - name: Tag Image
+      run: |
+        docker tag sample-app:latest \
+        ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+
+    - name: Push Image
+      run: |
+        docker push \
+        ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
