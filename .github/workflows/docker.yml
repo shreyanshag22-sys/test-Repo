@@ -1,0 +1,51 @@
+name: Docker CI/CD
+2
+ 
+3
+on:
+4
+push:
+5
+branches:
+6
+- main
+7
+ 
+8
+jobs:
+9
+build:
+10
+runs-on: ubuntu-latest
+11
+ 
+12
+steps:
+13
+- name: Checkout Code
+14
+uses: actions/checkout@v4
+15
+ 
+16
+- name: Login Docker Hub
+17
+uses: docker/login-action@v3
+18
+with:
+19
+username: ${{ secrets.DOCKER_USERNAME }}
+20
+password: ${{ secrets.DOCKER_PASSWORD }}
+21
+ 
+22
+- name: Build Image
+23
+run: docker build -t ${{ secrets.DOCKER_USERNAME }}/test-repo:latest .
+24
+ 
+25
+- name: Push Image
+26
+run: docker push ${{ secrets.DOCKER_USERNAME }}/test-repo:latest
